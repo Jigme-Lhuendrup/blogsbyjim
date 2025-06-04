@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - Blogs By Jim</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <main class="main-content">
+            <h1 class="title">Check Your Email</h1>
+            <div class="verification-message">
+                <p>We've sent a verification link to <strong><%= email %></strong></p>
+                <p>Please check your email and click the verification link to complete your registration.</p>
+                <p class="note">Note: The verification link will expire in 24 hours.</p>
+                <% if (locals.error) { %>
+                    <p class="error-message"><%= error %></p>
+                <% } %>
+                <% if (locals.success) { %>
+                    <p class="success-message"><%= success %></p>
+                <% } %>
+                <form action="/resend-verification" method="POST" class="resend-form">
+                    <input type="hidden" name="email" value="<%= email %>">
+                    <button type="submit" class="btn resend-btn">Resend Verification Email</button>
+                </form>
+            </div>
+            <a href="/" class="btn login-btn">Return to Home</a>
+        </main>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Blogs By Jim</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+            background-color: #E5D5D5;
+        }
+
+        .error-title {
+            font-size: 2rem;
+            color: #3A3238;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            color: #8B6F6F;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .error-details {
+            background-color: rgba(139, 111, 111, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            overflow-wrap: break-word;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #8B6F6F;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #3A3238;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1 class="error-title">Oops! Something went wrong</h1>
+        <p class="error-message"><%= message %></p>
+        <% if (error && Object.keys(error).length > 0) { %>
+            <div class="error-details">
+                <pre><%= JSON.stringify(error, null, 2) %></pre>
+            </div>
+        <% } %>
+        <a href="/" class="back-btn">Back to Home</a>
+    </div>
+</body>
+</html> 

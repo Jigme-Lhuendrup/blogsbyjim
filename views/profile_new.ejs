@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier Prime', monospace;
+        }
+
+        :root {
+            --primary-bg: #f8f1f1;
+            --card-bg: #fff9f9;
+            --accent-color: #e6c0c0;
+            --accent-hover: #d9b3b3;
+            --text-primary: #3a3a3a;
+            --text-secondary: #5e5e5e;
+            --border-color: #e7dada;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8e6e6 0%, #f0d4d4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+            position: relative; /* For positioning the back button */
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 70px; /* Position below the back button */
+            right: 20px;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--accent-color); /* Consistent styling */
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border: none; /* Ensure it looks like other buttons */
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .info-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .info-container:hover {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Profile Section */
+        .profile-section {
+            margin-bottom: 1.8rem;
+            position: relative;
+        }
+
+        .profile-image-container {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 1.8rem;
+            border: 5px solid var(--accent-color);
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-image-container:hover {
+            transform: scale(1.03);
+            border-color: var(--accent-hover);
+        }
+
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-upload-area {
+            margin: 1.2rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #profileImageInput { /* Hide the default file input */
+            display: none;
+        }
+
+        .btn-upload-label {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-upload-label:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #submitProfileImage {
+            padding: 0.6rem 1.2rem;
+            background-color: #a88282;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #submitProfileImage:hover {
+            background-color: #936e6e;
+            transform: translateY(-2px);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin: 0.8rem 0;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* User Details Section */
+        .user-details {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .user-detail-item {
+            display: block;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            padding: 0.9rem 0.6rem;
+            border-bottom: 1px solid var(--border-color);
+            margin: 0 auto 0.6rem;
+            max-width: 320px;
+            transition: var(--transition);
+        }
+
+        .user-detail-item:hover {
+            background-color: rgba(230, 192, 192, 0.1);
+            border-radius: 6px;
+        }
+
+        .user-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Posts Section */
+        .posts-section-new {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .posts-section-new .label {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            margin-bottom: 0.8rem;
+            display: block;
+            font-weight: 500;
+        }
+
+        .posts-dropdown-container {
+            position: relative;
+            background-color: #f5efef;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .posts-dropdown-container:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .posts-dropdown {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background-color: transparent;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .posts-dropdown:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(230, 192, 192, 0.4);
+        }
+
+        .posts-dropdown-container::after {
+            content: '▼';
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        /* Delete Button */
+        .delete-post-button-container {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .delete-post-button {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #d4a5a5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.5px;
+        }
+
+        .delete-post-button:hover {
+            background-color: #c79292;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .info-container {
+                padding: 1.8rem;
+                margin: 1rem;
+                border-radius: 14px;
+            }
+
+            .profile-image-container {
+                width: 110px;
+                height: 110px;
+                margin-bottom: 1.5rem;
+            }
+
+            .profile-name {
+                font-size: 1.3rem;
+            }
+
+            .user-detail-item {
+                font-size: 0.95rem;
+                padding: 0.8rem 0.5rem;
+            }
+
+            .posts-section-new .label {
+                font-size: 1.05rem;
+            }
+
+            .posts-dropdown {
+                font-size: 0.95rem;
+                padding: 0.7rem 1rem;
+            }
+
+            .delete-post-button {
+                padding: 0.7rem 1.8rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+
+            .info-container {
+                padding: 1.5rem;
+            }
+
+            .profile-upload-area {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            #submitProfileImage {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="javascript:history.back()" class="back-button">Back</a>
+    <a href="/logout" class="logout-button">Logout</a> <!-- Added Logout Button -->
+    <div class="info-container">
+        <div class="profile-section">
+            <div class="profile-image-container">
+                <img src="<%= user.profile_image_url || '/uploads/profiles/default-avatar.jpg' %>" alt="Profile Picture" class="profile-image" id="profileImage">
+            </div>
+            <form id="profileImageForm" action="/profile/upload-image" method="POST" enctype="multipart/form-data" class="profile-upload-area">
+                <label for="profileImageInput" class="btn-upload-label">Upload Photo</label>
+                <input type="file" name="profileImage" id="profileImageInput" accept="image/*" onchange="previewImage(event); document.getElementById('submitProfileImage').style.display='inline-block'; document.querySelector('label[for=profileImageInput]').textContent = event.target.files[0] ? event.target.files[0].name : 'Upload Photo';">
+                <button type="submit" id="submitProfileImage" style="display:none;">Save Photo</button>
+            </form>
+            <div class="profile-name"><%= user.username %></div>
+        </div>
+
+        <div class="user-details">
+            <div class="user-detail-item"><%= user.email %></div>
+            <div class="user-detail-item"><%= user.gender || 'Not specified' %></div>
+            <div class="user-detail-item"><%= user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString('en-GB') : 'Not specified' %></div>
+            <div class="user-detail-item"><%= user.full_name || user.username %></div>
+        </div>
+
+        <div class="posts-section-new">
+            <label for="postsDropdown" class="label">Posts</label>
+            <div class="posts-dropdown-container">
+                <select id="postsDropdown" class="posts-dropdown">
+                    <option value="">Select a post</option>
+                    <% if (typeof posts !== 'undefined' && posts && posts.length > 0) { %>
+                        <% posts.forEach(post => { %>
+                            <option value="<%= post.id %>"><%= post.title %></option>
+                        <% }); %>
+                    <% } else { %>
+                        <option value="" disabled>No posts available</option>
+                    <% } %>
+                </select>
+            </div>
+        </div>
+
+        <div class="delete-post-button-container">
+            <button class="delete-post-button" onclick="deleteSelectedPost()">Delete Post</button>
+        </div>
+    </div>
+
+    <script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('profileImage');
+            output.src = reader.result;
+        };
+        if (event.target.files && event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+            document.getElementById('submitProfileImage').style.display = 'inline-block'; // Show save button
+            document.querySelector('label[for=profileImageInput]').textContent = event.target.files[0].name; // Show filename
+        } else {
+            document.getElementById('submitProfileImage').style.display = 'none'; // Hide save button if no file
+            document.querySelector('label[for=profileImageInput]').textContent = 'Upload Photo'; // Reset label
+        }
+    }
+
+    // Hide save button initially
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('submitProfileImage').style.display = 'none';
+    });
+
+    async function deleteSelectedPost() {
+        const dropdown = document.getElementById('postsDropdown');
+        const postId = dropdown.value;
+
+        if (!postId) {
+            alert('Please select a post to delete.');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/posts/${postId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+            console.log('Delete response from server:', result);
+
+            if (response.ok && result.success) {
+                for (let i = 0; i < dropdown.options.length; i++) {
+                    if (dropdown.options[i].value === postId) {
+                        dropdown.remove(i);
+                        break;
+                    }
+                }
+                
+                if (dropdown.options.length === 0 || (dropdown.options.length === 1 && dropdown.options[0].value === "")) {
+                    dropdown.innerHTML = '<option value="" disabled>No posts available</option>';
+                     if (dropdown.options.length === 1 && dropdown.options[0].value === "") {
+                         dropdown.options[0].textContent = "No posts available";
+                         dropdown.options[0].disabled = true;
+                    }
+                } else if (dropdown.options.length > 0 && dropdown.options[0].value === "") {
+                     dropdown.value = "";
+                }
+                alert(result.message || 'Post deleted successfully!');
+            } else {
+                alert(`Failed to delete post: ${result.message || 'Server returned ' + response.status}`);
+            }
+        } catch (error) {
+            console.error('Error deleting post:', error);
+            alert('An error occurred while deleting the post. Please try again.');
+        }
+    }
+
+    // Optional: AJAX form submission for profile image
+    // document.getElementById('profileImageForm').addEventListener('submit', async function(event) {
+    //     event.preventDefault();
+    //     const formData = new FormData(this);
+    //     const submitButton = document.getElementById('submitProfileImage');
+    //     const originalButtonText = submitButton.textContent;
+    //     submitButton.textContent = 'Saving...';
+    //     submitButton.disabled = true;
+
+    //     try {
+    //         const response = await fetch(this.action, {
+    //             method: 'POST',
+    //             body: formData,
+    //         });
+    //         const result = await response.json();
+    //         if (response.ok && result.success) {
+    //             alert('Profile picture updated successfully!');
+    //             if(result.imageUrl) {
+    //                 document.getElementById('profileImage').src = result.imageUrl + '?' + new Date().getTime();
+    //             }
+    //             submitButton.style.display = 'none';
+    //         } else {
+    //             alert(result.message || 'Failed to update profile picture.');
+    //             submitButton.style.display = 'inline-block';
+    //         }
+    //     } catch (error) {
+    //         console.error('Error uploading profile picture:', error);
+    //         alert('An error occurred while uploading. Please try again.');
+    //         submitButton.style.display = 'inline-block';
+    //     } finally {
+    //         if (submitButton.style.display !== 'none') {
+    //            submitButton.textContent = originalButtonText;
+    //         }
+    //         submitButton.disabled = false;
+    //     }
+    // });
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<div class="contact-container">
+    <div class="contact-form-wrapper">
+        <h1 class="contact-title">Contact Us</h1>
+        <p class="contact-subtitle">We'd love to hear from you!</p>
+
+        <% if (locals.error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+        <% if (locals.success) { %>
+            <div class="success-message"><%= success %></div>
+        <% } %>
+
+        <form class="contact-form" action="/contact" method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required
+                    value="<%= locals.email || '' %>"
+                    placeholder="Enter your email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="comment">Comment</label>
+                <textarea 
+                    id="comment" 
+                    name="comment" 
+                    required
+                    placeholder="Enter your message"
+                    rows="5"
+                ><%= locals.comment || '' %></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Send Message</button>
+        </form>
+    </div>
+</div> 

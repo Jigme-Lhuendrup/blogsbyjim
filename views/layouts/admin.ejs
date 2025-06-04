@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title + ' - Admin Dashboard' : 'Admin Dashboard' %></title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+        }
+        
+        .font-special-elite {
+            font-family: 'Special Elite', cursive;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #1a2942;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        
+        .sidebar-link {
+            color: #a1a1aa;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-link:hover, .sidebar-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .top-bar {
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+    </style>
+    
+    <%- defineContent('styles') %>
+</head>
+<body>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Admin Info -->
+            <div class="p-4 border-b border-gray-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+                        <i class="fas fa-user text-gray-300"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-medium"><%= typeof user !== 'undefined' ? user.username : 'Admin' %></h2>
+                        <p class="text-gray-400 text-sm">Administrator</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="mt-4">
+                <div class="px-4 py-2">
+                    <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        General
+                    </h5>
+                </div>
+
+                <a href="/admin/dashboard" class="sidebar-link flex items-center px-4 py-3 <%= typeof page !== 'undefined' && page === 'dashboard' ? 'active' : '' %>">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span class="ml-3">Dashboard</span>
+                </a>
+
+                <a href="/admin/reports" class="sidebar-link flex items-center px-4 py-3 <%= typeof page !== 'undefined' && page === 'reports' ? 'active' : '' %>">
+                    <i class="fas fa-file-alt w-5"></i>
+                    <span class="ml-3">Reports</span>
+                </a>
+
+                <div class="px-4 py-2 mt-4">
+                    <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Settings
+                    </h5>
+                </div>
+
+                <a href="/admin/settings" class="sidebar-link flex items-center px-4 py-3 <%= typeof page !== 'undefined' && page === 'settings' ? 'active' : '' %>">
+                    <i class="fas fa-cog w-5"></i>
+                    <span class="ml-3">Settings</span>
+                </a>
+
+                <a href="/logout" class="sidebar-link flex items-center px-4 py-3 text-red-400 hover:text-red-300">
+                    <i class="fas fa-sign-out-alt w-5"></i>
+                    <span class="ml-3">Logout</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-1">
+            <!-- Top Bar -->
+            <div class="top-bar p-4 flex justify-between items-center">
+                <h1 class="text-2xl font-special-elite text-gray-800"><%= typeof title !== 'undefined' ? title : 'Admin Dashboard' %></h1>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div class="p-6">
+                <%- body %>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin_scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Sign Up - Blogs By Jim</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav class="top-nav">
+            <button onclick="history.back()" class="back-btn">Back</button>
+        </nav>
+        
+        <main class="main-content">
+            <h1 class="title">Complete Profile</h1>
+            <% if (error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+            <form class="signup-form" action="/signup/complete" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="<%= locals.username || '' %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male" <%= locals.gender === 'male' ? 'selected' : '' %>>Male</option>
+                        <option value="female" <%= locals.gender === 'female' ? 'selected' : '' %>>Female</option>
+                        <option value="other" <%= locals.gender === 'other' ? 'selected' : '' %>>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" value="<%= locals.dob || '' %>" required>
+                </div>
+                <button type="submit" class="btn signup-btn">Sign Up</button>
+            </form>
+        </main>
+    </div>
+</body>
+</html> 

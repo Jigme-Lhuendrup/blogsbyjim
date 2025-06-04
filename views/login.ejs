@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Blogs By Jim</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav class="top-nav">
+            <a href="/" class="back-btn">Back</a>
+        </nav>
+        
+        <main class="main-content">
+            <h1 class="title">Login</h1>
+            <% if (locals.error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+            <% if (locals.success) { %>
+                <div class="success-message"><%= success %></div>
+            <% } %>
+            <form class="login-form" action="/login" method="POST">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="<%= locals.email || '' %>" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn login-btn">Login</button>
+                <div class="form-links">
+                    <a href="/forgot-password" class="form-link">Forgot Password?</a>
+                    <span class="separator">•</span>
+                    <a href="/signup-part1" class="form-link">Create Account</a>
+                </div>
+            </form>
+        </main>
+    </div>
+</body>
+</html> 

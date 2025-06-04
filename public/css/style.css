@@ -1,0 +1,279 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Special Elite', cursive;
+    background-color: #E5D5D5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    padding: 20px;
+}
+
+.top-nav {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100% - 100px);
+    gap: 2rem;
+}
+
+.title {
+    font-size: 4rem;
+    color: #3A3238;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 10px 30px;
+    font-family: 'Special Elite', cursive;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn {
+    background-color: #C7B5B5;
+    color: #3A3238;
+}
+
+.signup-btn {
+    background-color: #8B6F6F;
+    color: #fff;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.contact-btn, .back-btn {
+    padding: 8px 20px;
+    font-family: 'Special Elite', cursive;
+    background-color: #8B6F6F;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.contact-btn:hover, .back-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Signup Form Styles */
+.signup-form {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #3A3238;
+    font-size: 1.1rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.8rem;
+    font-family: 'Special Elite', cursive;
+    font-size: 1rem;
+    border: 2px solid #C7B5B5;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.7);
+    color: #3A3238;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #8B6F6F;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Fix for signup button in auth-buttons */
+.auth-buttons .signup-btn {
+    width: auto;
+    margin-top: 0;
+}
+
+/* Add this after the existing styles */
+
+.error-message {
+    background-color: rgba(255, 87, 87, 0.1);
+    border: 2px solid #ff5757;
+    color: #ff5757;
+    padding: 1rem;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Add after existing styles */
+
+.verification-message {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.verification-message p {
+    margin: 1rem 0;
+    color: #3A3238;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.verification-message.error {
+    border: 2px solid #ff5757;
+}
+
+.note {
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+}
+
+.verification-message strong {
+    color: #8B6F6F;
+}
+
+.resend-form {
+    margin-top: 1.5rem;
+}
+
+.resend-btn {
+    background-color: #8B6F6F;
+    color: white;
+    opacity: 0.9;
+    width: auto;
+    margin: 0 auto;
+    font-size: 0.9rem;
+}
+
+.resend-btn:hover {
+    opacity: 1;
+}
+
+.success-message {
+    background-color: rgba(75, 181, 67, 0.1);
+    border: 2px solid #4bb543;
+    color: #4bb543;
+    padding: 1rem;
+    border-radius: 15px;
+    margin: 1rem 0;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* Add a cooldown state for the resend button */
+.resend-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.login-form {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-links {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.form-link {
+    color: #8B6F6F;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.form-link:hover {
+    color: #3A3238;
+    text-decoration: underline;
+}
+
+.separator {
+    margin: 0 0.5rem;
+    color: #8B6F6F;
+}
+
+/* Success message animation */
+.success-message {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Add hover effect to form inputs */
+.form-group input:hover {
+    border-color: #8B6F6F;
+} 

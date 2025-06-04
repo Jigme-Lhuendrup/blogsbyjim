@@ -1,0 +1,37 @@
+{
+  "name": "blogsbyjim",
+  "version": "1.0.0",
+  "description": "A blog website with aesthetic theme",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jigme-Lhuendrup/blogsbyjim.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jigme-Lhuendrup/blogsbyjim/issues"
+  },
+  "homepage": "https://github.com/Jigme-Lhuendrup/blogsbyjim#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.17.3",
+    "method-override": "^3.0.0",
+    "multer": "^2.0.0",
+    "nodemailer": "^7.0.3",
+    "pg-promise": "^11.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
