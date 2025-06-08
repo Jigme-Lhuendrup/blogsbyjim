@@ -7,14 +7,4 @@ ALTER TABLE posts
     ALTER COLUMN created_at SET NOT NULL;
 
 -- Add updated_at column if it doesn't exist
-DO $$ 
-BEGIN 
-    IF NOT EXISTS (
-        SELECT 1 
-        FROM information_schema.columns 
-        WHERE table_name = 'posts' 
-        AND column_name = 'updated_at'
-    ) THEN
-        ALTER TABLE posts ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE;
-    END IF;
-END $$; 
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP; 
