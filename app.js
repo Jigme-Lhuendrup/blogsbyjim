@@ -111,9 +111,9 @@ app.use((err, req, res, next) => {
 
 // Server startup with port from environment
 const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode`);
-  console.log(`Listening on http://localhost:${PORT}`);
+  console.log(`Listening on port ${PORT}`);
 });
 
 module.exports = app;
