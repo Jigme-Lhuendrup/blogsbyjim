@@ -22,16 +22,19 @@ async function runMigrations() {
             const sql = await fs.readFile(filePath, 'utf8');
             
             try {
-                // Split the SQL file into individual statements
-                const statements = sql
-                    .split(';')
-                    .map(statement => statement.trim())
-                    .filter(statement => statement.length > 0);
+                // Run each migration file in its own transaction
+                await db.tx(async t => {
+                    // Split the SQL file into individual statements
+                    const statements = sql
+                        .split(';')
+                        .map(statement => statement.trim())
+                        .filter(statement => statement.length > 0);
 
-                // Execute each statement separately
-                for (const statement of statements) {
-                    await db.none(statement + ';');
-                }
+                    // Execute each statement separately
+                    for (const statement of statements) {
+                        await t.none(statement + ';');
+                    }
+                });
                 
                 console.log(`Completed migration: ${file}`);
             } catch (error) {
