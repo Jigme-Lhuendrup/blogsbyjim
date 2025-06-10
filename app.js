@@ -121,23 +121,31 @@ app.use(methodOverride(function(req, res) {
     }
 }));
 
-// Session middleware with PostgreSQL store
+// Session configuration
 app.use(session({
     store: new pgSession({
-        pool: db.$pool,
-        tableName: 'user_sessions',
+        pool: db.pool,
+        tableName: 'session',
         createTableIfMissing: true
     }),
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    cookie: { 
+    cookie: {
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: 'lax'
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
+
+// Log session configuration
+console.log('Session Configuration:', {
+    NODE_ENV: process.env.NODE_ENV,
+    SESSION_SECRET: process.env.SESSION_SECRET ? '(set)' : '(not set)',
+    cookie_secure: process.env.NODE_ENV === 'production',
+    cookie_httpOnly: true,
+    cookie_maxAge: '24 hours'
+});
 
 // Flash messages middleware
 app.use((req, res, next) => {

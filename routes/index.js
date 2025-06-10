@@ -169,6 +169,11 @@ router.post('/signup/part2', async (req, res) => {
     try {
         const { email, password, confirmPassword } = req.body;
         
+        console.log('Signup part 1 submission:', {
+            email: email ? '(provided)' : '(missing)',
+            password_length: password ? password.length : 0
+        });
+        
         // Basic validation
         if (password !== confirmPassword) {
             return res.render('signup-part1', { 
@@ -200,7 +205,18 @@ router.post('/signup/part2', async (req, res) => {
         }
         
         // Store in session and proceed to part 2
-        req.session.signupData = { email, password };
+        req.session.signupData = { 
+            email, 
+            password,
+            timestamp: Date.now() // Add timestamp to track session freshness
+        };
+        
+        console.log('Stored signup data in session:', {
+            email: email ? '(provided)' : '(missing)',
+            password_length: password ? password.length : 0,
+            timestamp: req.session.signupData.timestamp
+        });
+        
         res.render('signup-part2', { 
             error: null,
             title: 'Complete Sign Up',
@@ -221,16 +237,26 @@ router.post('/signup/part2', async (req, res) => {
 router.post('/signup/complete', async (req, res) => {
     try {
         const { username, gender, dob } = req.body;
-        const { email, password } = req.session.signupData || {};
-
+        const signupData = req.session.signupData || {};
+        
         console.log('Signup completion attempt:', {
-            email: email ? '(provided)' : '(missing)',
+            email: signupData.email ? '(provided)' : '(missing)',
+            password_length: signupData.password ? signupData.password.length : 0,
             username,
             gender,
-            dob
+            dob,
+            session_timestamp: signupData.timestamp,
+            current_time: Date.now(),
+            session_age: signupData.timestamp ? Date.now() - signupData.timestamp : 'N/A'
         });
 
-        if (!email || !password) {
+        // Check if session data is too old (more than 30 minutes)
+        if (!signupData.timestamp || Date.now() - signupData.timestamp > 30 * 60 * 1000) {
+            console.log('Signup session expired');
+            return res.redirect(getUrl('/signup-part1'));
+        }
+
+        if (!signupData.email || !signupData.password) {
             console.log('Missing email or password in session data');
             return res.redirect(getUrl('/signup-part1'));
         }
@@ -252,8 +278,8 @@ router.post('/signup/complete', async (req, res) => {
         // Create new user
         console.log('Creating new user...');
         const user = await User.createUser({
-            email,
-            password,
+            email: signupData.email,
+            password: signupData.password,
             username,
             gender,
             dob
@@ -268,7 +294,7 @@ router.post('/signup/complete', async (req, res) => {
         // Send verification email
         console.log('Attempting to send verification email...');
         try {
-            await sendVerificationEmail(email, user.verification_token);
+            await sendVerificationEmail(signupData.email, user.verification_token);
             console.log('Verification email sent successfully');
         } catch (emailError) {
             console.error('Failed to send verification email:', emailError);
@@ -282,7 +308,7 @@ router.post('/signup/complete', async (req, res) => {
         // Redirect to verification pending page
         console.log('Rendering verification pending page');
         res.render('verification-pending', { 
-            email,
+            email: signupData.email,
             title: 'Verify Your Email',
             layout: 'layouts/auth'
         });
