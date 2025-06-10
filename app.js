@@ -6,6 +6,7 @@ const expressLayouts = require('express-ejs-layouts');
 const methodOverride = require('method-override');
 const pgSession = require('connect-pg-simple')(session);
 const { db } = require('./config/database');
+const fs = require('fs').promises;
 const app = express();
 
 // Log environment check
@@ -16,6 +17,47 @@ console.log('Environment Variables Check:', {
     SESSION_SECRET: process.env.SESSION_SECRET ? '[SET]' : '[NOT SET]'
 });
 
+// Run migrations
+async function runMigrations() {
+    try {
+        console.log('Starting database migrations...');
+        const migrationsDir = path.join(__dirname, 'migrations');
+        const files = await fs.readdir(migrationsDir);
+        
+        const migrationFiles = files
+            .filter(f => f.endsWith('.sql'))
+            .sort();
+
+        for (const file of migrationFiles) {
+            console.log(`Running migration: ${file}`);
+            const filePath = path.join(migrationsDir, file);
+            const sql = await fs.readFile(filePath, 'utf8');
+            
+            try {
+                await db.tx(async t => {
+                    const statements = sql
+                        .split(';')
+                        .map(statement => statement.trim())
+                        .filter(statement => statement.length > 0);
+
+                    for (const statement of statements) {
+                        await t.none(statement + ';');
+                    }
+                });
+                console.log(`Completed migration: ${file}`);
+            } catch (error) {
+                console.error(`Error in migration ${file}:`, error);
+                throw error;
+            }
+        }
+        console.log('All migrations completed successfully!');
+        return true;
+    } catch (error) {
+        console.error('Migration failed:', error);
+        return false;
+    }
+}
+
 // Database connection check with better error handling
 async function initializeDatabase() {
     try {
@@ -23,6 +65,14 @@ async function initializeDatabase() {
         const obj = await db.connect();
         console.log('Database connection verified');
         obj.done();
+
+        // Run migrations after successful connection
+        const migrationsSuccess = await runMigrations();
+        if (!migrationsSuccess) {
+            console.error('WARNING: Database migrations failed');
+            return false;
+        }
+
         return true;
     } catch (error) {
         console.error('FATAL: Database connection failed:', error);
@@ -31,7 +81,6 @@ async function initializeDatabase() {
             code: error.code,
             stack: error.stack
         });
-        // Don't exit immediately, let the application start and show proper error
         return false;
     }
 }
