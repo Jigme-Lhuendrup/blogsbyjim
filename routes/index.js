@@ -72,6 +72,15 @@ router.get('/login', (req, res) => {
     });
 });
 
+// Signup page route
+router.get('/signup', (req, res) => {
+    res.render('signup-part1', {
+        error: null,
+        title: 'Sign Up',
+        layout: 'layouts/auth'
+    });
+});
+
 // Handle login submission
 router.post('/login', async (req, res) => {
     try {
