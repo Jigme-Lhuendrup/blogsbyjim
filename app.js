@@ -125,8 +125,12 @@ app.use(methodOverride(function(req, res) {
 app.use(session({
     store: new pgSession({
         pool: db.pool,
-        tableName: 'session',
-        createTableIfMissing: true
+        tableName: 'user_sessions',
+        createTableIfMissing: true,
+        pruneSessionInterval: 60,
+        errorCallback: function(err) {
+            console.error('Session store error:', err);
+        }
     }),
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
@@ -144,7 +148,8 @@ console.log('Session Configuration:', {
     SESSION_SECRET: process.env.SESSION_SECRET ? '(set)' : '(not set)',
     cookie_secure: process.env.NODE_ENV === 'production',
     cookie_httpOnly: true,
-    cookie_maxAge: '24 hours'
+    cookie_maxAge: '24 hours',
+    tableName: 'user_sessions'
 });
 
 // Flash messages middleware

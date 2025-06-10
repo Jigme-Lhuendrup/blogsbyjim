@@ -155,172 +155,141 @@ router.get('/logout', (req, res) => {
     });
 });
 
-// Signup Part 1 route
-router.get('/signup-part1', (req, res) => {
-    res.render('signup-part1', { 
-        error: null,
-        title: 'Sign Up',
-        layout: 'layouts/auth'
-    });
-});
-
-// Handle signup part 1 submission and show part 2
-router.post('/signup/part2', async (req, res) => {
+// Signup part 1 route
+router.post('/signup-part1', async (req, res) => {
     try {
         const { email, password, confirmPassword } = req.body;
-        
-        console.log('Signup part 1 submission:', {
+        console.log('Signup part 1 submission:', { 
             email: email ? '(provided)' : '(missing)',
             password_length: password ? password.length : 0
         });
-        
+
         // Basic validation
-        if (password !== confirmPassword) {
-            return res.render('signup-part1', { 
-                error: 'Passwords do not match',
-                email,
-                title: 'Sign Up',
-                layout: 'layouts/auth'
+        if (!email || !password) {
+            return res.status(400).render('signup-part1', { 
+                error: 'Email and password are required',
+                email: email || ''
             });
         }
 
-        // Check if email already exists
-        const existingUser = await User.findByEmail(email);
-        if (existingUser) {
-            if (!existingUser.is_verified) {
-                // User exists but not verified, allow resending verification
-                return res.render('verification-pending', { 
-                    email,
-                    error: 'Account already exists but not verified. You can resend the verification email.',
-                    title: 'Verification Required',
-                    layout: 'layouts/auth'
-                });
-            }
-            return res.render('signup-part1', { 
-                error: 'Email already registered',
-                email,
-                title: 'Sign Up',
-                layout: 'layouts/auth'
+        if (password !== confirmPassword) {
+            return res.status(400).render('signup-part1', { 
+                error: 'Passwords do not match',
+                email: email
             });
         }
-        
-        // Store in session and proceed to part 2
-        req.session.signupData = { 
-            email, 
-            password,
-            timestamp: Date.now() // Add timestamp to track session freshness
-        };
-        
-        console.log('Stored signup data in session:', {
-            email: email ? '(provided)' : '(missing)',
-            password_length: password ? password.length : 0,
-            timestamp: req.session.signupData.timestamp
+
+        // Store in session with a promise to ensure it's saved
+        await new Promise((resolve, reject) => {
+            req.session.signupData = {
+                email,
+                password,
+                timestamp: Date.now()
+            };
+            
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Error saving session:', err);
+                    reject(err);
+                } else {
+                    console.log('Stored signup data in session:', { 
+                        email: '(provided)',
+                        password_length: password.length,
+                        timestamp: Date.now()
+                    });
+                    resolve();
+                }
+            });
         });
-        
-        res.render('signup-part2', { 
-            error: null,
-            title: 'Complete Sign Up',
-            layout: 'layouts/auth'
-        });
+
+        // Only redirect after session is saved
+        res.redirect('/signup-part2');
     } catch (error) {
-        console.error('Error in signup part 1:', error);
-        res.render('signup-part1', { 
-            error: 'An error occurred. Please try again.',
-            email: req.body.email,
-            title: 'Sign Up',
-            layout: 'layouts/auth'
+        console.error('Signup part 1 error:', error);
+        res.status(500).render('signup-part1', { 
+            error: 'An error occurred during signup. Please try again.',
+            email: email || ''
         });
     }
 });
 
-// Handle final signup submission
+// Signup part 2 route
 router.post('/signup/complete', async (req, res) => {
     try {
         const { username, gender, dob } = req.body;
-        const signupData = req.session.signupData || {};
-        
+        const signupData = req.session.signupData;
+
         console.log('Signup completion attempt:', {
-            email: signupData.email ? '(provided)' : '(missing)',
-            password_length: signupData.password ? signupData.password.length : 0,
+            email: signupData?.email ? '(provided)' : '(missing)',
+            password_length: signupData?.password ? signupData.password.length : 0,
             username,
             gender,
             dob,
-            session_timestamp: signupData.timestamp,
+            session_timestamp: signupData?.timestamp,
             current_time: Date.now(),
-            session_age: signupData.timestamp ? Date.now() - signupData.timestamp : 'N/A'
+            session_age: signupData?.timestamp ? `${Math.round((Date.now() - signupData.timestamp) / 1000)}s` : 'N/A'
         });
 
-        // Check if session data is too old (more than 30 minutes)
-        if (!signupData.timestamp || Date.now() - signupData.timestamp > 30 * 60 * 1000) {
+        // Check if session data exists and is not expired (30 minutes)
+        if (!signupData || !signupData.email || !signupData.password || 
+            Date.now() - signupData.timestamp > 30 * 60 * 1000) {
             console.log('Signup session expired');
-            return res.redirect(getUrl('/signup-part1'));
-        }
-
-        if (!signupData.email || !signupData.password) {
-            console.log('Missing email or password in session data');
-            return res.redirect(getUrl('/signup-part1'));
-        }
-
-        // Check if username already exists
-        const existingUsername = await User.findByUsername(username);
-        if (existingUsername) {
-            console.log('Username already exists:', username);
-            return res.render('signup-part2', { 
-                error: 'Username already taken',
-                username,
-                gender,
-                dob,
-                title: 'Complete Sign Up',
-                layout: 'layouts/auth'
+            return res.status(400).render('signup-part1', { 
+                error: 'Signup session expired. Please start over.',
+                email: ''
             });
         }
 
-        // Create new user
-        console.log('Creating new user...');
+        // Check if username is taken
+        const existingUser = await User.findByUsername(username);
+        if (existingUser) {
+            return res.status(400).render('signup-part2', { 
+                error: 'Username already taken',
+                username,
+                gender,
+                dob
+            });
+        }
+
+        // Create user
         const user = await User.createUser({
             email: signupData.email,
             password: signupData.password,
             username,
             gender,
-            dob
+            dob: new Date(dob)
         });
+
         console.log('User created successfully:', {
-            id: user.id,
+            user_id: user.id,
             email: user.email,
             username: user.username,
-            verification_token: user.verification_token ? '(set)' : '(not set)'
+            has_verification_token: !!user.verification_token
         });
 
         // Send verification email
-        console.log('Attempting to send verification email...');
         try {
-            await sendVerificationEmail(signupData.email, user.verification_token);
-            console.log('Verification email sent successfully');
+            await sendVerificationEmail(user.email, user.verification_token);
+            console.log('Verification email sent successfully to:', user.email);
         } catch (emailError) {
-            console.error('Failed to send verification email:', emailError);
-            // Continue with signup process even if email fails
-            // The user can request a new verification email later
+            console.error('Error sending verification email:', emailError);
+            // Continue with signup even if email fails
         }
 
-        // Clear session data
-        req.session.signupData = null;
-        
-        // Redirect to verification pending page
-        console.log('Rendering verification pending page');
-        res.render('verification-pending', { 
-            email: signupData.email,
-            title: 'Verify Your Email',
-            layout: 'layouts/auth'
+        // Clear signup data from session
+        delete req.session.signupData;
+        req.session.save((err) => {
+            if (err) {
+                console.error('Error clearing session data:', err);
+            }
         });
+
+        res.render('verification-pending', { email: user.email });
     } catch (error) {
-        console.error('Error in signup completion:', error);
-        res.render('signup-part2', { 
-            error: 'An error occurred. Please try again.',
-            username: req.body.username,
-            gender: req.body.gender,
-            dob: req.body.dob,
-            title: 'Complete Sign Up',
-            layout: 'layouts/auth'
+        console.error('Signup completion error:', error);
+        res.status(500).render('error', { 
+            message: 'Error completing signup',
+            error: error
         });
     }
 });
