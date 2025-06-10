@@ -223,13 +223,22 @@ router.post('/signup/complete', async (req, res) => {
         const { username, gender, dob } = req.body;
         const { email, password } = req.session.signupData || {};
 
+        console.log('Signup completion attempt:', {
+            email: email ? '(provided)' : '(missing)',
+            username,
+            gender,
+            dob
+        });
+
         if (!email || !password) {
+            console.log('Missing email or password in session data');
             return res.redirect(getUrl('/signup-part1'));
         }
 
         // Check if username already exists
         const existingUsername = await User.findByUsername(username);
         if (existingUsername) {
+            console.log('Username already exists:', username);
             return res.render('signup-part2', { 
                 error: 'Username already taken',
                 username,
@@ -241,6 +250,7 @@ router.post('/signup/complete', async (req, res) => {
         }
 
         // Create new user
+        console.log('Creating new user...');
         const user = await User.createUser({
             email,
             password,
@@ -248,14 +258,29 @@ router.post('/signup/complete', async (req, res) => {
             gender,
             dob
         });
+        console.log('User created successfully:', {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            verification_token: user.verification_token ? '(set)' : '(not set)'
+        });
 
         // Send verification email
-        await sendVerificationEmail(email, user.verification_token);
+        console.log('Attempting to send verification email...');
+        try {
+            await sendVerificationEmail(email, user.verification_token);
+            console.log('Verification email sent successfully');
+        } catch (emailError) {
+            console.error('Failed to send verification email:', emailError);
+            // Continue with signup process even if email fails
+            // The user can request a new verification email later
+        }
 
         // Clear session data
         req.session.signupData = null;
         
         // Redirect to verification pending page
+        console.log('Rendering verification pending page');
         res.render('verification-pending', { 
             email,
             title: 'Verify Your Email',

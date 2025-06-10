@@ -3,13 +3,12 @@ const path = require('path');
 const { getUrl } = require('./urlHelper');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
-// Log environment variables (excluding sensitive data)
-console.log('Environment Variables Check:', {
-    SMTP_USER: process.env.SMTP_USER ? 'Set' : 'Not Set',
-    SMTP_PASS: process.env.SMTP_PASS ? 'Set' : 'Not Set',
-    SMTP_FROM: process.env.SMTP_FROM ? 'Set' : 'Not Set',
-    SMTP_HOST: process.env.SMTP_HOST,
-    SMTP_PORT: process.env.SMTP_PORT
+// Log environment variables (without sensitive data)
+console.log('Email Service Configuration:', {
+    NODE_ENV: process.env.NODE_ENV,
+    SMTP_USER: process.env.SMTP_USER ? '(set)' : '(not set)',
+    SMTP_PASS: process.env.SMTP_PASS ? '(set)' : '(not set)',
+    RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL || '(not set)'
 });
 
 const transporter = nodemailer.createTransport({
@@ -23,7 +22,8 @@ const transporter = nodemailer.createTransport({
     connectionTimeout: 10000, // 10 seconds
     greetingTimeout: 5000,    // 5 seconds
     socketTimeout: 10000,     // 10 seconds
-    debug: true
+    debug: true,
+    logger: true
 });
 
 // Verify transporter configuration
@@ -33,6 +33,7 @@ transporter.verify(function(error, success) {
         console.error('Current configuration:', {
             host: 'smtp.gmail.com',
             port: 465,
+            secure: true,
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASS ? '(password set)' : '(password not set)'
@@ -44,7 +45,14 @@ transporter.verify(function(error, success) {
 });
 
 const sendVerificationEmail = async (email, token) => {
+    console.log('Starting sendVerificationEmail:', {
+        email,
+        token_length: token ? token.length : 0,
+        environment: process.env.NODE_ENV
+    });
+
     const verificationLink = getUrl(`/verify/${token}`);
+    console.log('Generated verification link:', verificationLink);
     
     const mailOptions = {
         from: {
@@ -86,11 +94,23 @@ const sendVerificationEmail = async (email, token) => {
             smtp_pass_length: process.env.SMTP_PASS ? process.env.SMTP_PASS.length : 0,
             verification_link: verificationLink
         });
+
         const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully:', info.messageId);
+        console.log('Email sent successfully:', {
+            messageId: info.messageId,
+            response: info.response,
+            accepted: info.accepted,
+            rejected: info.rejected
+        });
         return true;
     } catch (error) {
-        console.error('Detailed email error:', error);
+        console.error('Detailed email error:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            command: error.command
+        });
         console.error('Mail options used:', {
             from: mailOptions.from,
             to: mailOptions.to,
