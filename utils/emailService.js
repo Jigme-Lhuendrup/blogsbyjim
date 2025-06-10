@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const path = require('path');
+const { getUrl } = require('./urlHelper');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 // Log environment variables (excluding sensitive data)
@@ -43,8 +44,7 @@ transporter.verify(function(error, success) {
 });
 
 const sendVerificationEmail = async (email, token) => {
-    const port = process.env.PORT || 3000; // Default to 3000 if PORT is not set
-    const verificationLink = `http://localhost:${port}/verify/${token}`;
+    const verificationLink = getUrl(`/verify/${token}`);
     
     const mailOptions = {
         from: {
@@ -83,7 +83,8 @@ const sendVerificationEmail = async (email, token) => {
             to: mailOptions.to,
             subject: mailOptions.subject,
             smtp_user: process.env.SMTP_USER,
-            smtp_pass_length: process.env.SMTP_PASS ? process.env.SMTP_PASS.length : 0
+            smtp_pass_length: process.env.SMTP_PASS ? process.env.SMTP_PASS.length : 0,
+            verification_link: verificationLink
         });
         const info = await transporter.sendMail(mailOptions);
         console.log('Email sent successfully:', info.messageId);
@@ -93,7 +94,8 @@ const sendVerificationEmail = async (email, token) => {
         console.error('Mail options used:', {
             from: mailOptions.from,
             to: mailOptions.to,
-            subject: mailOptions.subject
+            subject: mailOptions.subject,
+            verification_link: verificationLink
         });
         throw new Error('Failed to send verification email. Please try again later.');
     }

@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const { getUrl } = require('../utils/urlHelper');
 
 exports.showVerificationPage = (req, res) => {
     res.render('auth/verify', { 
@@ -29,7 +30,7 @@ exports.verifyEmail = async (req, res) => {
         }
 
         req.session.success_msg = 'Email verified successfully! You can now login.';
-        res.redirect('/auth/login');
+        res.redirect(getUrl('/auth/login'));
     } catch (error) {
         console.error('Verification error:', error);
         res.render('auth/verify', {
@@ -43,16 +44,16 @@ exports.resendVerification = async (req, res) => {
     try {
         const userId = req.session.userId;
         if (!userId) {
-            return res.redirect('/auth/login');
+            return res.redirect(getUrl('/auth/login'));
         }
 
         await User.resendVerification(userId);
         req.session.success_msg = 'A new verification code has been generated. Please check the console logs for the code.';
-        res.redirect('/auth/verify');
+        res.redirect(getUrl('/auth/verify'));
     } catch (error) {
         console.error('Resend verification error:', error);
         req.session.error_msg = 'Failed to resend verification code';
-        res.redirect('/auth/verify');
+        res.redirect(getUrl('/auth/verify'));
     }
 };
 

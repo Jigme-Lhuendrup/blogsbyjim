@@ -7,6 +7,7 @@ const Contact = require('../models/Contact');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const { getUrl } = require('../utils/urlHelper');
 
 // Import posts router
 const postsRouter = require('./posts');
@@ -115,9 +116,9 @@ router.post('/login', async (req, res) => {
 
         // Redirect based on user role
         if (user.is_admin) {
-            res.redirect('/admin/dashboard');
+            res.redirect(getUrl('/admin/dashboard'));
         } else {
-            res.redirect('/about');
+            res.redirect(getUrl('/about'));
         }
     } catch (error) {
         console.error('Login error:', error);
@@ -223,7 +224,7 @@ router.post('/signup/complete', async (req, res) => {
         const { email, password } = req.session.signupData || {};
 
         if (!email || !password) {
-            return res.redirect('/signup-part1');
+            return res.redirect(getUrl('/signup-part1'));
         }
 
         // Check if username already exists
@@ -335,7 +336,7 @@ router.get('/verify/:token', async (req, res) => {
             });
         }
 
-        res.redirect('/login?verified=true');
+        res.redirect(getUrl('/login?verified=true'));
     } catch (error) {
         console.error('Error in email verification:', error);
         res.render('verification-error', {
