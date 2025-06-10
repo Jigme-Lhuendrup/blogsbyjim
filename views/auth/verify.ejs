@@ -1,0 +1,42 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Email Verification</h3>
+                </div>
+                <div class="card-body">
+                    <% if (message) { %>
+                        <div class="alert alert-info"><%= message %></div>
+                    <% } %>
+                    <% if (error) { %>
+                        <div class="alert alert-danger"><%= error %></div>
+                    <% } %>
+                    
+                    <form action="/auth/verify" method="POST">
+                        <div class="form-group">
+                            <label for="code">Verification Code</label>
+                            <input type="text" class="form-control" id="code" name="code" 
+                                   placeholder="Enter the 6-digit code" required>
+                            <small class="form-text text-muted">
+                                Please enter the verification code shown in the console logs.
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Verify Email</button>
+                    </form>
+                    
+                    <div class="mt-3 text-center">
+                        <p>Didn't receive a code?</p>
+                        <form action="/auth/resend-verification" method="POST">
+                            <button type="submit" class="btn btn-link">Resend Verification Code</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %> 
