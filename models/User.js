@@ -8,7 +8,8 @@ class User {
     static async createUser({ email, password, username, gender, dob }) {
         try {
             const hashedPassword = await bcrypt.hash(password, 10);
-            const verificationToken = crypto.randomBytes(32).toString('hex');
+            // Generate a 6-digit verification code
+            const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
             const result = await db.one(
@@ -18,8 +19,11 @@ class User {
                 )
                 VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
                 RETURNING id, email, username, gender, date_of_birth, verification_token`,
-                [email, hashedPassword, username, gender, dob, verificationToken, verificationExpiry]
+                [email, hashedPassword, username, gender, dob, verificationCode, verificationExpiry]
             );
+            
+            // Log the verification code for development
+            console.log(`Verification code for ${email}: ${verificationCode}`);
             
             return result;
         } catch (error) {
@@ -50,7 +54,7 @@ class User {
         return await bcrypt.compare(providedPassword, storedHash);
     }
 
-    static async verifyEmail(token) {
+    static async verifyEmail(code) {
         try {
             const result = await db.oneOrNone(
                 `UPDATE users 
@@ -60,7 +64,7 @@ class User {
                 WHERE verification_token = $1 
                 AND verification_expiry > CURRENT_TIMESTAMP
                 RETURNING id, email, username`,
-                [token]
+                [code]
             );
             return result;
         } catch (error) {
@@ -70,7 +74,8 @@ class User {
 
     static async resendVerification(userId) {
         try {
-            const verificationToken = crypto.randomBytes(32).toString('hex');
+            // Generate a new 6-digit verification code
+            const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
             const result = await db.one(
@@ -79,8 +84,12 @@ class User {
                     verification_expiry = $2
                 WHERE id = $3
                 RETURNING id, email, verification_token`,
-                [verificationToken, verificationExpiry, userId]
+                [verificationCode, verificationExpiry, userId]
             );
+
+            // Log the new verification code for development
+            console.log(`New verification code for user ${userId}: ${verificationCode}`);
+            
             return result;
         } catch (error) {
             throw error;
