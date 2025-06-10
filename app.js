@@ -5,10 +5,10 @@ const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts');
 const methodOverride = require('method-override');
 const pgSession = require('connect-pg-simple')(session);
-const { db } = require('./config/database'); // Updated import path
+const { db } = require('./config/database');
 const app = express();
 
-// Database connection check (optional)
+// Database connection check
 db.connect()
   .then(obj => {
     console.log('Database connection verified');
@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Changed to true for better parsing
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Method override
@@ -57,22 +57,22 @@ app.use(methodOverride(function(req, res) {
 // Session middleware with PostgreSQL store
 app.use(session({
   store: new pgSession({
-    pool: db.$pool, // Use the pool from pg-promise
+    pool: db.$pool,
     tableName: 'user_sessions',
     createTableIfMissing: true
   }),
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
-  saveUninitialized: false, // Changed to false for GDPR compliance
+  saveUninitialized: false,
   cookie: { 
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'lax'
   }
 }));
 
-// Flash messages middleware (optional addition)
+// Flash messages middleware
 app.use((req, res, next) => {
   res.locals.success_msg = req.session.success_msg;
   res.locals.error_msg = req.session.error_msg;
